@@ -1,0 +1,4 @@
+-consistencia de los precios
+-si se borra un precio asociado a una estadia, la estadia queda asociada a un precio anterior?
+-actualizar es lo mismo que borrar o hay que tener otras cosas en cuenta
+-otras en la consulta 7
