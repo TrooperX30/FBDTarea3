@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION trigf() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION trigf04() RETURNS trigger AS $$
 BEGIN
     IF EXISTS (SELECT 1
                FROM estadias_anteriores e
@@ -24,4 +24,4 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER control_costos BEFORE UPDATE OR DELETE ON costos_habitacion
     FOR EACH ROW 
-    EXECUTE FUNCTION trigf();
+    EXECUTE FUNCTION trigf04();

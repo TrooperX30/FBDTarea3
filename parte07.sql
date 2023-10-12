@@ -12,7 +12,7 @@ CREATE TABLE finguitos_usuarios(
 				estado smallint,
                 PRIMARY KEY(cliente_documento, hotel_codigo, check_in));--creo la tabla de los finguitos
 
-CREATE OR REPLACE FUNCTION trigf() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION trigf07() RETURNS trigger AS $$
 DECLARE
 	cant_finguitos int;
 	precio numeric(8,2);
@@ -107,4 +107,4 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER finguitos BEFORE INSERT OR UPDATE OR DELETE ON estadias_anteriores
 	FOR EACH ROW 
-    EXECUTE FUNCTION trigf();
+    EXECUTE FUNCTION trigf07();

@@ -7,7 +7,7 @@ CREATE TABLE registro_uso(
                 cantidad integer,
                 PRIMARY KEY(usuario, tabla,fecha));
 
-CREATE OR REPLACE FUNCTION trigf() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION trigf05() RETURNS trigger AS $$
 DECLARE
 	cant int;
 BEGIN
@@ -36,12 +36,12 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER registro_operaciones BEFORE INSERT OR UPDATE OR DELETE ON estadias_anteriores
     FOR EACH ROW 
-    EXECUTE FUNCTION trigf('estadias_anteriores');
+    EXECUTE FUNCTION trigf05();
     
 CREATE OR REPLACE TRIGGER registro_operaciones BEFORE INSERT OR UPDATE OR DELETE ON reservas_anteriores
     FOR EACH ROW 
-    EXECUTE FUNCTION trigf('reservas_anteriores');
+    EXECUTE FUNCTION trigf05();
     
 CREATE OR REPLACE TRIGGER registro_operaciones BEFORE INSERT OR UPDATE OR DELETE ON clientes
     FOR EACH ROW 
-    EXECUTE FUNCTION trigf('clientes');
+    EXECUTE FUNCTION trigf05();
