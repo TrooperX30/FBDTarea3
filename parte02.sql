@@ -5,7 +5,16 @@ DECLARE
 BEGIN
 	FOR th IN (SELECT DISTINCT h.tipo_habitacion_codigo
 			   FROM habitaciones h
-			   WHERE h.hotel_codigo = codhotel) LOOP-- itero por cada tipo de habitacion
+			   WHERE h.hotel_codigo = codhotel AND
+			   		 EXISTS (SELECT 1
+							 FROM estadias_anteriores e
+							 WHERE e.hotel_codigo = codhotel AND
+							 	   e.nro_habitacion = h.nro_habitacion AND
+							 	   NOT EXISTS(SELECT 1
+											  FROM reservas_anteriores r
+											  WHERE e.hotel_codigo = r.hotel_codigo AND
+												    e.nro_habitacion = r.nro_habitacion AND
+												    e.check_in = r.check_in))) LOOP-- itero por cada tipo de habitacion
 		DECLARE
 			suma_costos numeric(8,2) := 0;
 		BEGIN
@@ -42,12 +51,8 @@ BEGIN
 					CONTINUE;
 				END IF;
 			END LOOP;
-			IF suma_costos <> 0 THEN
-				tipohab := th.tipo_habitacion_codigo;
-				monto := suma_costos;
-			ELSE
-				CONTINUE;
-			END IF;
+			tipohab := th.tipo_habitacion_codigo;
+			monto := suma_costos;
 			RETURN NEXT;-- devuelvo el tipo junto con el total acumulado
 		END;
 	END LOOP;

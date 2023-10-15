@@ -21,7 +21,7 @@ CREATE OR REPLACE FUNCTION trigf06() RETURNS trigger AS $$
 BEGIN
 	IF TG_OP = 'INSERT' THEN
 		INSERT INTO audit_estadia(idop, accion, fecha, usuario, cliente_documento, hotel_codigo, nro_habitacion, check_in)
-		VALUES (currval('logidseq'), 'I', current_date, current_user, NEW.cliente_documento, NEW.hotel_codigo, NEW.nro_habitacion, NEW.check_in);
+		VALUES (nextval('logidseq'), 'I', current_date, current_user, NEW.cliente_documento, NEW.hotel_codigo, NEW.nro_habitacion, NEW.check_in);
 	ELSIF TG_OP = 'UPDATE' THEN
 		INSERT INTO audit_estadia(idop, accion, fecha, usuario, cliente_documento, hotel_codigo, nro_habitacion, check_in)
 		VALUES (nextval('logidseq'), 'U', current_date, current_user, OLD.cliente_documento, OLD.hotel_codigo, OLD.nro_habitacion, OLD.check_in);
@@ -29,10 +29,11 @@ BEGIN
 		INSERT INTO audit_estadia(idop, accion, fecha, usuario, cliente_documento, hotel_codigo, nro_habitacion, check_in)
 		VALUES (nextval('logidseq'), 'D', current_date, current_user, OLD.cliente_documento, OLD.hotel_codigo, OLD.nro_habitacion, OLD.check_in);
 	END IF;
+	RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER auditoria_estadias BEFORE INSERT OR UPDATE OR DELETE ON estadias_anteriores
+CREATE OR REPLACE TRIGGER auditoria_estadias AFTER INSERT OR UPDATE OR DELETE ON estadias_anteriores
 	FOR EACH ROW 
     EXECUTE FUNCTION trigf06();
 	

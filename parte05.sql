@@ -10,12 +10,13 @@ CREATE TABLE registro_uso(
 CREATE OR REPLACE FUNCTION trigf05() RETURNS trigger AS $$
 DECLARE
 	cant int;
+	fechita date;
 BEGIN
     IF EXISTS (SELECT 1 
-               FROM registro_uso 
+               FROM registro_uso ru
                WHERE usuario = current_user AND 
-               tabla = TG_TABLE_NAME AND
-               fecha = current_date) THEN
+               ru.tabla = TG_TABLE_NAME AND
+               ru.fecha = current_date) THEN
         SELECT r.cantidad INTO cant
         FROM registro_uso r
         WHERE r.usuario = current_user AND 
@@ -34,14 +35,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER registro_operaciones BEFORE INSERT OR UPDATE OR DELETE ON estadias_anteriores
-    FOR EACH ROW 
+CREATE OR REPLACE TRIGGER registro_operaciones1 BEFORE INSERT OR UPDATE OR DELETE ON estadias_anteriores
+    FOR EACH STATEMENT 
     EXECUTE FUNCTION trigf05();
     
-CREATE OR REPLACE TRIGGER registro_operaciones BEFORE INSERT OR UPDATE OR DELETE ON reservas_anteriores
-    FOR EACH ROW 
+CREATE OR REPLACE TRIGGER registro_operaciones2 BEFORE INSERT OR UPDATE OR DELETE ON reservas_anteriores
+    FOR EACH STATEMENT 
     EXECUTE FUNCTION trigf05();
     
-CREATE OR REPLACE TRIGGER registro_operaciones BEFORE INSERT OR UPDATE OR DELETE ON clientes
-    FOR EACH ROW 
+CREATE OR REPLACE TRIGGER registro_operaciones3 BEFORE INSERT OR UPDATE OR DELETE ON clientes
+    FOR EACH STATEMENT 
     EXECUTE FUNCTION trigf05();
