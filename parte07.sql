@@ -49,7 +49,6 @@ BEGIN
 		END IF;
 		INSERT INTO finguitos_usuarios(cliente_documento, hotel_codigo, check_in, check_out, fecha_inicio, fecha_fin, finguitos, fecha_operacion, estado) 
                VALUES (NEW.cliente_documento, NEW.hotel_codigo, NEW.check_in, NEW.check_out, inicio, fin, cant_finguitos, timestamp_actual, estado_finguitos);
-		RETURN NEW;
 	ELSIF TG_OP = 'UPDATE' THEN
 		IF EXISTS (SELECT 1
 				   FROM finguitos_usuarios fu
@@ -92,7 +91,6 @@ BEGIN
                 fecha_operacion = timestamp_actual,
 				estado = estado_finguitos
 			WHERE cliente_documento = OLD.cliente_documento AND hotel_codigo = OLD.hotel_codigo AND check_in = OLD.check_in;
-			RETURN NEW;
 		END IF;
 	ELSIF TG_OP = 'DELETE' THEN
 		RAISE NOTICE 'DELETEEEEEEEEEEEE';
@@ -105,9 +103,9 @@ BEGIN
 			UPDATE finguitos_usuarios--actualizo los finguitos a cancelados
 			SET estado = 3
 			WHERE cliente_documento = OLD.cliente_documento AND hotel_codigo = OLD.hotel_codigo AND check_in = OLD.check_in;
-			RETURN NEW;
 		END IF;
 	END IF;
+	RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 

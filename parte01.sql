@@ -9,7 +9,7 @@ BEGIN
 	IF codigo = 'R' OR codigo = 'r' THEN
 		RETURN (SELECT COUNT(*) FROM reservas_anteriores r WHERE r.cliente_documento = clientedoc AND EXTRACT(YEAR FROM r.fecha_reserva) = anio);
 	ELSIF codigo = 'E' OR codigo = 'e' THEN
-		RETURN (SELECT COUNT(*) FROM estadias_anteriores e WHERE e.cliente_documento = clientedoc AND EXTRACT(YEAR FROM e.fecha_reserva) = anio);
+		RETURN (SELECT COUNT(*) FROM estadias_anteriores e WHERE e.cliente_documento = clientedoc AND EXTRACT(YEAR FROM e.check_in) = anio);
 	ELSE
 		RAISE NOTICE 'Código de operación incorrecto';
 		RETURN -1;
