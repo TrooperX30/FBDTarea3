@@ -49,7 +49,7 @@ BEGIN
 		INSERT INTO finguitos_usuarios(cliente_documento, hotel_codigo, check_in, check_out, fecha_inicio, fecha_fin, finguitos, fecha_operacion, estado) 
                VALUES (NEW.cliente_documento, NEW.hotel_codigo, NEW.check_in, NEW.check_out, inicio, fin, cant_finguitos, timestamp_actual, estado_finguitos);
 		FOR mis_estadias_finguitos IN (SELECT * FROM finguitos_usuarios WHERE cliente_documento = NEW.cliente_documento) LOOP
-			IF mis_estadias_finguitos.fin < current_timestamp THEN--actualizo las que se vencieron
+			IF mis_estadias_finguitos.fecha_fin < current_timestamp THEN--actualizo las que se vencieron
 				UPDATE finguitos_usuarios
 				SET estado = 2
 				WHERE cliente_documento = NEW.cliente_documento;
@@ -98,7 +98,7 @@ BEGIN
 				estado = estado_finguitos
 			WHERE cliente_documento = OLD.cliente_documento AND hotel_codigo = OLD.hotel_codigo AND check_in = OLD.check_in;
 			FOR mis_estadias_finguitos IN (SELECT * FROM finguitos_usuarios WHERE cliente_documento = NEW.cliente_documento) LOOP
-				IF mis_estadias_finguitos.fin < current_timestamp AND mis_estadias_finguitos.estado = 1 THEN--actualizo las que se vencieron
+				IF mis_estadias_finguitos.fecha_fin < current_timestamp AND mis_estadias_finguitos.estado = 1 THEN--actualizo las que se vencieron
 					UPDATE finguitos_usuarios
 					SET estado = 2
 					WHERE cliente_documento = NEW.cliente_documento;
