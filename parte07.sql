@@ -54,7 +54,7 @@ BEGIN
 			IF mis_estadias_finguitos.fin < current_timestamp THEN--actualizo las que se vencieron
 				UPDATE finguitos_usuarios
 				SET estado = 2
-				WHERE cliente_documento = NEW.cliente_documento
+				WHERE cliente_documento = NEW.cliente_documento;
 			END IF;
 		END LOOP;
 	ELSIF TG_OP = 'UPDATE' THEN
@@ -103,7 +103,7 @@ BEGIN
 				IF mis_estadias_finguitos.fin < current_timestamp AND mis_estadias_finguitos.estado = 1 THEN--actualizo las que se vencieron
 					UPDATE finguitos_usuarios
 					SET estado = 2
-					WHERE cliente_documento = NEW.cliente_documento
+					WHERE cliente_documento = NEW.cliente_documento;
 				END IF;
 			END LOOP;
 		END IF;
