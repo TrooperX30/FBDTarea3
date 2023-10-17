@@ -106,13 +106,11 @@ BEGIN
 			END LOOP;
 		END IF;
 	ELSIF TG_OP = 'DELETE' THEN
-		RAISE NOTICE 'DELETEEEEEEEEEEEE';
 		IF EXISTS (SELECT 1--si existe la cosa?????? no lo pide
 				   FROM finguitos_usuarios fu
 				   WHERE fu.cliente_documento = OLD.cliente_documento AND
 				   	     fu.hotel_codigo = OLD.hotel_codigo AND
 				  		 fu.check_in = OLD.check_in) THEN
-			RAISE NOTICE 'LEASDFASDFASDFAS';
 			UPDATE finguitos_usuarios--actualizo los finguitos a cancelados
 			SET estado = 3
 			WHERE cliente_documento = OLD.cliente_documento AND hotel_codigo = OLD.hotel_codigo AND check_in = OLD.check_in;
