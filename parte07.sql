@@ -20,6 +20,7 @@ DECLARE
 	inicio date;
 	fin date;
 	timestamp_actual timestamp;
+	mis_estadias_finguitos record;
 BEGIN
     IF TG_OP = 'INSERT' THEN
 		SELECT NEW.check_in + interval '1 month' INTO inicio;--calculo inicio
@@ -49,6 +50,13 @@ BEGIN
 		END IF;
 		INSERT INTO finguitos_usuarios(cliente_documento, hotel_codigo, check_in, check_out, fecha_inicio, fecha_fin, finguitos, fecha_operacion, estado) 
                VALUES (NEW.cliente_documento, NEW.hotel_codigo, NEW.check_in, NEW.check_out, inicio, fin, cant_finguitos, timestamp_actual, estado_finguitos);
+		FOR mis_estadias_finguitos IN (SELECT * FROM finguitos_usuarios WHERE cliente_documento = NEW.cliente_documento) LOOP
+			IF mis_estadias_finguitos.fin < current_timestamp THEN--actualizo las que se vencieron
+				UPDATE finguitos_usuarios
+				SET estado = 2
+				WHERE cliente_documento = NEW.cliente_documento
+			END IF;
+		END LOOP;
 	ELSIF TG_OP = 'UPDATE' THEN
 		IF EXISTS (SELECT 1
 				   FROM finguitos_usuarios fu
@@ -60,7 +68,7 @@ BEGIN
 					   FROM estadias_anteriores e
 					   WHERE e.hotel_codigo = NEW.hotel_codigo AND 
 					   		 e.cliente_documento = NEW.cliente_documento AND 
-					   		 e.check_in <> NEW.check_in) THEN--que tenga otra estadia sin ser la misma
+					   		 e.check_in <> NEW.check_in) THEN--que tenga otra estadia en el mismo hotel
 				cant_finguitos := 5;--ya tiene estadia en el hotel
 			ELSE
 				cant_finguitos := 0;--no tiene estadia en el hotel
@@ -91,6 +99,13 @@ BEGIN
                 fecha_operacion = timestamp_actual,
 				estado = estado_finguitos
 			WHERE cliente_documento = OLD.cliente_documento AND hotel_codigo = OLD.hotel_codigo AND check_in = OLD.check_in;
+			FOR mis_estadias_finguitos IN (SELECT * FROM finguitos_usuarios WHERE cliente_documento = NEW.cliente_documento) LOOP
+				IF mis_estadias_finguitos.fin < current_timestamp AND mis_estadias_finguitos.estado = 1 THEN--actualizo las que se vencieron
+					UPDATE finguitos_usuarios
+					SET estado = 2
+					WHERE cliente_documento = NEW.cliente_documento
+				END IF;
+			END LOOP;
 		END IF;
 	ELSIF TG_OP = 'DELETE' THEN
 		RAISE NOTICE 'DELETEEEEEEEEEEEE';
@@ -105,7 +120,7 @@ BEGIN
 			WHERE cliente_documento = OLD.cliente_documento AND hotel_codigo = OLD.hotel_codigo AND check_in = OLD.check_in;
 		END IF;
 	END IF;
-	RETURN NEW;
+	RETURN coalesce(NEW, OLD);
 END;
 $$ LANGUAGE plpgsql;
 

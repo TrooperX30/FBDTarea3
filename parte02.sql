@@ -3,7 +3,7 @@ DECLARE
 	th record;
 	ee record;
 BEGIN
-	FOR th IN (SELECT DISTINCT h.tipo_habitacion_codigo
+	FOR th IN (SELECT DISTINCT h.tipo_habitacion_codigo-- itero por cada tipo de habitacion que tenga al menos 1 estadia espontanea
 			   FROM habitaciones h
 			   WHERE h.hotel_codigo = codhotel AND
 			   		 EXISTS (SELECT 1
@@ -14,11 +14,11 @@ BEGIN
 											  FROM reservas_anteriores r
 											  WHERE e.hotel_codigo = r.hotel_codigo AND
 												    e.nro_habitacion = r.nro_habitacion AND
-												    e.check_in = r.check_in))) LOOP-- itero por cada tipo de habitacion
+												    e.check_in = r.check_in))) LOOP
 		DECLARE
 			suma_costos numeric(8,2) := 0;
 		BEGIN
-			FOR ee IN (SELECT *
+			FOR ee IN (SELECT * -- itero por cada estadia espontanea de th
 					   FROM estadias_anteriores e NATURAL JOIN habitaciones h2
 					   WHERE e.hotel_codigo = codhotel AND
 					   		 h2.tipo_habitacion_codigo = th.tipo_habitacion_codigo AND
@@ -26,12 +26,12 @@ BEGIN
 										 FROM reservas_anteriores r
 										 WHERE r.hotel_codigo = codhotel AND
 										 r.nro_habitacion = e.nro_habitacion AND
-										 r.check_in = e.check_in)) LOOP-- itero por cada estadia espontanea de th
-				IF EXISTS (SELECT 1
+										 r.check_in = e.check_in)) LOOP
+				IF EXISTS (SELECT 1-- que haya algun precio previamente establecido
 						   FROM costos_habitacion ch
 						   WHERE (ch.fecha_desde - ee.check_in) < 0 AND
 								  ch.hotel_codigo = codhotel AND
-								  ch.nro_habitacion = ee.nro_habitacion) THEN-- que haya algun precio previamente establecido
+								  ch.nro_habitacion = ee.nro_habitacion) THEN
 					DECLARE
 						precio numeric(8,2) := 0;
 					BEGIN
